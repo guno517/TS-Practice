@@ -1,9 +1,24 @@
-const container = document.getElementById("root");
-const ajax = new XMLHttpRequest();
-const content = document.createElement("div");
+type Store = { // 타입 알리아스 type alias
+    currentPage: number; // 세미콜론
+    feeds: NewsFeed[];
+}
+
+type NewsFeed = {
+    id: number;
+    comments_count: number;
+    url: string;
+    time_ago: string;
+    points: number;
+    title: string;
+    read?: boolean; // ?는 선택 속성을 의미
+}
+
+const container: HTMLElement | null = document.getElementById("root");
+const ajax: XMLHttpRequest = new XMLHttpRequest();
+const content: HTMLDivElement = document.createElement("div");
 const NEWS_URL = "https://api.hnpwa.com/v0/news/1.json"; // 해커 뉴스 news 1페이지
 const CONTENT_URL = "https://api.hnpwa.com/v0/item/@id.json"; // @id를 통해 뉴스 기사 고유의 id를 파악해 해당 뉴스 기사의 json을 가져온다
-const store = {
+const store: Store = {
   currentPage: 1,
   feeds: [], //글 읽음 표시 유무를 위한 배열
 };
@@ -23,8 +38,16 @@ function makeFeeds(feeds) {
   return feeds;
 }
 
+function updateView(html){
+    if(container !== null){
+        container.innerHTML = html;
+    } else {
+        console.error('최위 컨테이너가 없어 UI를 진행하지 못합니다.')
+    }
+}
+
 function newsFeed() {
-  let newsFeed = store.feeds;
+  let newsFeed: NewsFeed[] = store.feeds;
   const newsList = [];
   let template = `
   <div class="bg-gray-600 min-h-screen">
@@ -88,7 +111,7 @@ function newsFeed() {
   );
   template = template.replace("{{__next_page__}}", store.currentPage + 1);
 
-  container.innerHTML = template;
+  updateView(template);
 }
 
 const ul = document.createElement("ul");
@@ -155,10 +178,11 @@ function newsDetail() {
 
     return commentString.join("");
   }
-
-  container.innerHTML = template.replace(
+  
+  updateView(template.replace(
     "{{__comments__}}",
     makeComment(newsContent.comments)
+  )
   );
 }
 
