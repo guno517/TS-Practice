@@ -13,6 +13,20 @@ type NewsFeed = {
     read?: boolean; // ?는 선택 속성을 의미
 }
 
+type NewsDetail = {
+    id: number;
+    time_ago: string;
+    title: string;
+    url: string;
+    user: string;
+    content: string;
+    comments: [];
+}
+
+type NewsComment = {
+    
+}
+
 const container: HTMLElement | null = document.getElementById("root");
 const ajax: XMLHttpRequest = new XMLHttpRequest();
 const content: HTMLDivElement = document.createElement("div");
@@ -23,7 +37,7 @@ const store: Store = {
   feeds: [], //글 읽음 표시 유무를 위한 배열
 };
 
-function getData(url) {
+function getData(url: string) {
   // 데이터를 가져오는 함수 생성
   ajax.open("GET", url, false);
   ajax.send();
