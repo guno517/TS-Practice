@@ -37,7 +37,7 @@ const store: Store = {
   feeds: [], //글 읽음 표시 유무를 위한 배열
 };
 
-function getData(url: string): NewsFeed[] | NewsDetail {
+function getData<AjaxResponse>(url: string): AjaxResponse { // 제네릭 사용 (호출하는 쪽에서 유형을 명시하면 그 유형을 그대로 반환 유형으로 사용한다는 뜻)
   // 데이터를 가져오는 함수 생성
   ajax.open("GET", url, false);
   ajax.send();
@@ -89,7 +89,7 @@ function newsFeed() {
   `;
 
   if (newsFeed.length === 0) {
-    newsFeed = store.feeds = makeFeeds(getData(NEWS_URL)); //
+    newsFeed = store.feeds = makeFeeds(getData<NewsFeed[]>(NEWS_URL)); //
   }
 
   for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
@@ -133,7 +133,7 @@ const ul = document.createElement("ul");
 function newsDetail() {
   // 제목을 클릭 할 때마다 해시 값이 바껴 haschange 함수가 호출된다. -> 내용 화면으로 진입하는 시점(hashchange)
   const id = location.hash.substr(7); //주소와 관련된 정보 제공, substr: () 안의 값 이후부터 끝가지 문자열 출력
-  const newsContent = getData(CONTENT_URL.replace("@id", id));
+  const newsContent = getData<NewsDetail>(CONTENT_URL.replace("@id", id));
   let template = `
   <div class="bg-gray-600 min-h-screen pb-8">
   <div class="bg-white text-xl">
