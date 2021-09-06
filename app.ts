@@ -3,28 +3,28 @@ type Store = { // 타입 알리아스 type alias
     feeds: NewsFeed[];
 }
 
-type NewsFeed = {
-    id: number;
-    comments_count: number;
-    url: string;
-    time_ago: string;
-    points: number;
-    title: string;
-    read?: boolean; // ?는 선택 속성을 의미
-}
-
-type NewsDetail = {
+type News = {
     id: number;
     time_ago: string;
     title: string;
     url: string;
     user: string;
     content: string;
-    comments: [];
 }
 
-type NewsComment = {
-    
+type NewsFeed = News & { // intersection 기능 (중복 생략 가능)
+    comments_count: number;
+    points: number;
+    read?: boolean; // ?는 선택 속성을 의미
+}
+
+type NewsDetail = News & {
+    comments: NewsComment[];
+}
+
+type NewsComment = News & {
+    comments: NewsComment[];
+    level: number;
 }
 
 const container: HTMLElement | null = document.getElementById("root");
@@ -37,7 +37,7 @@ const store: Store = {
   feeds: [], //글 읽음 표시 유무를 위한 배열
 };
 
-function getData(url: string) {
+function getData(url: string): NewsFeed[] | NewsDetail {
   // 데이터를 가져오는 함수 생성
   ajax.open("GET", url, false);
   ajax.send();
