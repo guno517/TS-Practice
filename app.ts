@@ -45,14 +45,14 @@ function getData<AjaxResponse>(url: string): AjaxResponse { // 제네릭 사용 
   return JSON.parse(ajax.response);
 }
 
-function makeFeeds(feeds) {
+function makeFeeds(feeds: NewsFeed[]): NewsFeed[] {
   for (let i = 0; i < feeds.length; i++) {
     feeds[i].read = false;
   }
   return feeds;
 }
 
-function updateView(html){
+function updateView(html: string): void{
     if(container !== null){
         container.innerHTML = html;
     } else {
@@ -60,7 +60,7 @@ function updateView(html){
     }
 }
 
-function newsFeed() {
+function newsFeed(): void {
   let newsFeed: NewsFeed[] = store.feeds;
   const newsList = [];
   let template = `
@@ -121,16 +121,16 @@ function newsFeed() {
   template = template.replace("{{__news_feed__}}", newsList.join(""));
   template = template.replace(
     "{{__prev_page__}}",
-    store.currentPage > 1 ? store.currentPage - 1 : 1
+    String(store.currentPage > 1 ? store.currentPage - 1 : 1)
   );
-  template = template.replace("{{__next_page__}}", store.currentPage + 1);
+  template = template.replace("{{__next_page__}}", String(store.currentPage + 1));
 
   updateView(template);
 }
 
 const ul = document.createElement("ul");
 
-function newsDetail() {
+function newsDetail(): void {
   // 제목을 클릭 할 때마다 해시 값이 바껴 haschange 함수가 호출된다. -> 내용 화면으로 진입하는 시점(hashchange)
   const id = location.hash.substr(7); //주소와 관련된 정보 제공, substr: () 안의 값 이후부터 끝가지 문자열 출력
   const newsContent = getData<NewsDetail>(CONTENT_URL.replace("@id", id));
@@ -169,29 +169,6 @@ function newsDetail() {
       break;
     }
   }
-
-  function makeComment(comments, called = 0) {
-    const commentString = [];
-
-    for (let i = 0; i < comments.length; i++) {
-      commentString.push(`
-          <div style="padding-left: ${called * 40}px;" class="mt-4">
-          <div class="text-gray-400">
-            <i class="fa fa-sort-up mr-2"></i>
-            <strong>${comments[i].user}</strong> ${comments[i].time_ago}
-          </div>
-          <p class="text-gray-700">${comments[i].content}</p>
-        </div>   
-          `);
-
-      if (comments[i].comments.length > 0) {
-        commentString.push(makeComment(comments[i].comments, called + 1)); // 재귀함수를 사용해서 대댓글 기능 구현(끝을 알 수 없는 구조에서 유용)
-        // 댓글이 몇번 호출 되었는지 체크하여 대댓글의 UI를 바꾼다(윗 댓글보다 padding이 더 들어가도록)
-      }
-    }
-
-    return commentString.join("");
-  }
   
   updateView(template.replace(
     "{{__comments__}}",
@@ -200,7 +177,31 @@ function newsDetail() {
   );
 }
 
-function router() {
+function makeComment(comments: NewsComment[]): string {
+    const commentString = [];
+
+    for (let i = 0; i < comments.length; i++) {
+        const comment: NewsComment = comments[i];
+      commentString.push(`
+          <div style="padding-left: ${comment.level * 40}px;" class="mt-4">
+          <div class="text-gray-400">
+            <i class="fa fa-sort-up mr-2"></i>
+            <strong>${comment.user}</strong> ${comment.time_ago}
+          </div>
+          <p class="text-gray-700">${comment.content}</p>
+        </div>   
+          `);
+
+      if (comment.comments.length > 0) {
+        commentString.push(makeComment(comment.comments)); // 재귀함수를 사용해서 대댓글 기능 구현(끝을 알 수 없는 구조에서 유용)
+        // 댓글이 몇번 호출 되었는지 체크하여 대댓글의 UI를 바꾼다(윗 댓글보다 padding이 더 들어가도록)
+      }
+    }
+
+    return commentString.join("");
+  }
+
+function router(): void {
   //location.hash를 통해 지금 보고있는 화면의 위치 해시값을 받아 목록을 보여줄지 내용을 보여줄지 정한다.
   const routePath = location.hash;
 
