@@ -37,12 +37,33 @@ const store: Store = {
   feeds: [], //글 읽음 표시 유무를 위한 배열
 };
 
-function getData<AjaxResponse>(url: string): AjaxResponse { // 제네릭 사용 (호출하는 쪽에서 유형을 명시하면 그 유형을 그대로 반환 유형으로 사용한다는 뜻)
-  // 데이터를 가져오는 함수 생성
-  ajax.open("GET", url, false);
-  ajax.send();
+class Api { // 개념 보완 부분
+  url: string;
+  ajax: XMLHttpRequest;
 
-  return JSON.parse(ajax.response);
+  constructor(url: string) {
+    this.url = url;
+    this.ajax = new XMLHttpRequest();
+  }
+
+  getRequest<AjaxResponse>(): AjaxResponse{
+    ajax.open("GET", this.url, false);
+    ajax.send();
+
+    return JSON.parse(ajax.response);
+  }
+}
+
+class NewsFeedApi extends Api {
+  getData(): NewsFeed[] {
+    return this.getRequest<NewsFeed[]>();
+  }
+}
+
+class NewsDetailApi extends Api {
+  getData(): NewsDetail {
+    return this.getRequest<NewsDetail>();
+  }
 }
 
 function makeFeeds(feeds: NewsFeed[]): NewsFeed[] {
