@@ -46,11 +46,11 @@ class Api { // 개념 보완 부분
     this.ajax = new XMLHttpRequest();
   }
 
-  getRequest<AjaxResponse>(): AjaxResponse{
-    ajax.open("GET", this.url, false);
-    ajax.send();
+  protected getRequest<AjaxResponse>(): AjaxResponse{
+    this.ajax.open("GET", this.url, false);
+    this.ajax.send();
 
-    return JSON.parse(ajax.response);
+    return JSON.parse(this.ajax.response);
   }
 }
 
@@ -82,6 +82,7 @@ function updateView(html: string): void{
 }
 
 function newsFeed(): void {
+  const api = new NewsFeedApi(NEWS_URL); // 클래스 인스턴스
   let newsFeed: NewsFeed[] = store.feeds;
   const newsList = [];
   let template = `
@@ -110,7 +111,7 @@ function newsFeed(): void {
   `;
 
   if (newsFeed.length === 0) {
-    newsFeed = store.feeds = makeFeeds(getData<NewsFeed[]>(NEWS_URL)); //
+    newsFeed = store.feeds = makeFeeds(api.getData()); //
   }
 
   for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
@@ -154,7 +155,8 @@ const ul = document.createElement("ul");
 function newsDetail(): void {
   // 제목을 클릭 할 때마다 해시 값이 바껴 haschange 함수가 호출된다. -> 내용 화면으로 진입하는 시점(hashchange)
   const id = location.hash.substr(7); //주소와 관련된 정보 제공, substr: () 안의 값 이후부터 끝가지 문자열 출력
-  const newsContent = getData<NewsDetail>(CONTENT_URL.replace("@id", id));
+  const api = new NewsDetailApi(CONTENT_URL.replace('@id',id));
+  const newsContent = api.getData();
   let template = `
   <div class="bg-gray-600 min-h-screen pb-8">
   <div class="bg-white text-xl">
