@@ -37,34 +37,46 @@ const store: Store = {
   feeds: [], //글 읽음 표시 유무를 위한 배열
 };
 
+//믹스인 함수
+function applyApiMixins(targetClass: any, baseClasses: any[]): void{
+  baseClasses.forEach(baseClass => {
+    Object.getOwnPropertyNames(baseClass.prototype).forEach(name => {
+      const descriptor = Object.getOwnPropertyDescriptor(baseClass.prototype, name);
+      
+      if(descriptor){
+        Object.defineProperty(targetClass.prototype, name, descriptor);
+      }
+    })
+  });
+}
+
 class Api { // 개념 보완 부분
-  url: string;
-  ajax: XMLHttpRequest;
+  getRequest<AjaxResponse>(url: string): AjaxResponse{
+    const ajax = new XMLHttpRequest();
+    ajax.open("GET", url, false);
+    ajax.send();
 
-  constructor(url: string) {
-    this.url = url;
-    this.ajax = new XMLHttpRequest();
-  }
-
-  protected getRequest<AjaxResponse>(): AjaxResponse{
-    this.ajax.open("GET", this.url, false);
-    this.ajax.send();
-
-    return JSON.parse(this.ajax.response);
+    return JSON.parse(ajax.response);
   }
 }
-
-class NewsFeedApi extends Api {
+class NewsFeedApi {
   getData(): NewsFeed[] {
-    return this.getRequest<NewsFeed[]>();
+    return this.getRequest<NewsFeed[]>(NEWS_URL);
   }
 }
 
-class NewsDetailApi extends Api {
-  getData(): NewsDetail {
-    return this.getRequest<NewsDetail>();
+class NewsDetailApi {
+  getData(id: string): NewsDetail {
+    return this.getRequest<NewsDetail>(CONTENT_URL.replace('@id',id));
   }
 }
+
+interface NewsFeedApi extends Api {};
+interface NewsDetailApi extends Api {};
+
+applyApiMixins(NewsFeedApi, [Api]);
+applyApiMixins(NewsDetailApi, [Api]);
+//상속에서 extends는 다중 상속을 지원하지 않는다. mixin은 가능하다.
 
 function makeFeeds(feeds: NewsFeed[]): NewsFeed[] {
   for (let i = 0; i < feeds.length; i++) {
@@ -82,7 +94,7 @@ function updateView(html: string): void{
 }
 
 function newsFeed(): void {
-  const api = new NewsFeedApi(NEWS_URL); // 클래스 인스턴스
+  const api = new NewsFeedApi(); // 클래스 인스턴스
   let newsFeed: NewsFeed[] = store.feeds;
   const newsList = [];
   let template = `
@@ -155,8 +167,8 @@ const ul = document.createElement("ul");
 function newsDetail(): void {
   // 제목을 클릭 할 때마다 해시 값이 바껴 haschange 함수가 호출된다. -> 내용 화면으로 진입하는 시점(hashchange)
   const id = location.hash.substr(7); //주소와 관련된 정보 제공, substr: () 안의 값 이후부터 끝가지 문자열 출력
-  const api = new NewsDetailApi(CONTENT_URL.replace('@id',id));
-  const newsContent = api.getData();
+  const api = new NewsDetailApi();
+  const newsContent = api.getData(id);
   let template = `
   <div class="bg-gray-600 min-h-screen pb-8">
   <div class="bg-white text-xl">
