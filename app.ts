@@ -68,10 +68,10 @@ class NewsDetailApi extends Api{
 }
 
 abstract class View {
-  template: string;
-  renderTemplate: string;
-  container: HTMLElement;
-  htmlList: string[];
+  private template: string;
+  private renderTemplate: string;
+  private container: HTMLElement;
+  private htmlList: string[];
 
   constructor(containerId: string, template: string) {
     const containerElement = document.getElementById(containerId);
@@ -86,26 +86,26 @@ abstract class View {
     this.renderTemplate = template;
     this.htmlList = [];
   }
-  updateView(): void{
+  protected updateView(): void{
         this.container.innerHTML = this.renderTemplate;
         this.renderTemplate = this.template; // 원래 값으로 돌려놓는 용도로 사용
   }
 
-  addHtml(htmlString: string): void{ // newsFeedView와 newsDetailView에서 사용된다.
+  protected addHtml(htmlString: string): void{ // newsFeedView와 newsDetailView에서 사용된다.
     this.htmlList.push(htmlString);
   }
 
-  getHtml(): string{
+  protected getHtml(): string{
     const snapshot = this.htmlList.join('');
     this.clearHtmlList();
     return snapshot;
   }
 
-  setTemplateDate(key: string, value: string): void{
+  protected setTemplateDate(key: string, value: string): void{
     this.renderTemplate = this.renderTemplate.replace(`{{__${key}__}}`, value);
   }
 
-  clearHtmlList(): void {
+  private clearHtmlList(): void {
     this.htmlList = [];
   }
 
@@ -118,7 +118,7 @@ class Router { // 역할: hash가 바뀌었을 때 해당하는 페이지를 보
 
   constructor() {
 
-    window.addEventListener("hashchange", router); //hash값을 받아 알맞는 라우터를 찾고 보여줄 화면을 지정한다
+    window.addEventListener("hashchange", this.route.bind(this)); //hash값을 받아 알맞는 라우터를 찾고 보여줄 화면을 지정한다
 
     this.routeTable = [];
     this.defaultRoute = null;
@@ -136,7 +136,7 @@ class Router { // 역할: hash가 바뀌었을 때 해당하는 페이지를 보
     const routePath = location.hash;
 
     if(routePath === '' && this.defaultRoute){
-      this.defaultRoute.page.renderTemplate
+      this.defaultRoute.page.render();
     }
 
     for(const routeInfo of this.routeTable) {
@@ -150,8 +150,8 @@ class Router { // 역할: hash가 바뀌었을 때 해당하는 페이지를 보
 }
 
 class NewsFeedView extends View{ // 클래스를 만든다는 것은 인스턴스를 만들어서 인스턴스에 필요한 정보들을 저장해 뒀다가 필요한 경우에 계속 재활용해서 쓸수 있다는 장점
-  api: NewsFeedApi;
-  feeds: NewsFeed[];
+  private api: NewsFeedApi;
+  private feeds: NewsFeed[];
   
   constructor(containerId: string) {
     let template: string = `
@@ -191,6 +191,8 @@ class NewsFeedView extends View{ // 클래스를 만든다는 것은 인스턴�
   }
 
   render():void {
+    store.currentPage = Number(location.hash.substr(7) || 1);
+
     for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
       const {id, title, comments_count, user, points, time_ago, read} = this.feeds[i];
       this.addHtml(`
@@ -228,7 +230,7 @@ class NewsFeedView extends View{ // 클래스를 만든다는 것은 인스턴�
     this.updateView();
     }
 
-    makeFeeds(): void {
+    private makeFeeds(): void {
       for (let i = 0; i < this.feeds.length; i++) {
         this.feeds[i].read = false;
       }
@@ -309,58 +311,13 @@ class NewsDetailView extends View {
   }
 }
 
-const ul = document.createElement("ul");
-
-function newsDetail(): void {
-  // 제목을 클릭 할 때마다 해시 값이 바껴 haschange 함수가 호출된다. -> 내용 화면으로 진입하는 시점(hashchange)
-  const id = location.hash.substr(7); //주소와 관련된 정보 제공, substr: () 안의 값 이후부터 끝가지 문자열 출력
-  const api = new NewsDetailApi();
-  const newsContent = api.getData(id);
-  let template = `
-  <div class="bg-gray-600 min-h-screen pb-8">
-  <div class="bg-white text-xl">
-    <div class="mx-auto px-4">
-      <div class="flex justify-between items-center py-6">
-        <div class="flex justify-start">
-          <h1 class="font-extrabold">Hacker News</h1>
-        </div>
-        <div class="items-center justify-end">
-          <a href="#/page/${store.currentPage}" class="text-gray-500">
-            <i class="fa fa-times"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="h-full border rounded-xl bg-white m-6 p-4 ">
-    <h2>${newsContent.title}</h2>
-    <div class="text-gray-400 h-20">
-      ${newsContent.content}
-    </div>
-
-    {{__comments__}}
-
-  </div>
-</div>
-  `;
-
-  for (let i = 0; i < store.feeds.length; i++) {
-    if (store.feeds[i].id === Number(id)) {
-      store.feeds[i].read = true;
-      break;
-    }
-  }
-  
-  updateView(template.replace(
-    "{{__comments__}}",
-    makeComment(newsContent.comments)));
-}
-
 const router: Router = new Router();
 const newsFeedView = new NewsFeedView('root');
 const newsDetailView = new NewsDetailView('root');
 
 router.setDefaultPage(newsFeedView);
-router.addroutePath('/page/', newsFeedView);
-router.addroutePath('/show/', newsDetailView);
+
+router.addRoutePath('/page/', newsFeedView);
+router.addRoutePath('/show/', newsDetailView);
+
+router.route();
