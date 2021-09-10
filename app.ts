@@ -27,6 +27,11 @@ interface NewsComment extends News {
     readonly level: number;
 }
 
+interface RouteInfo {
+  path: string;
+  page: View;
+}
+
 const NEWS_URL = "https://api.hnpwa.com/v0/news/1.json"; // 해커 뉴스 news 1페이지
 const CONTENT_URL = "https://api.hnpwa.com/v0/item/@id.json"; // @id를 통해 뉴스 기사 고유의 id를 파악해 해당 뉴스 기사의 json을 가져온다
 const store: Store = {
@@ -62,7 +67,7 @@ class NewsDetailApi extends Api{
   }
 }
 
-class View {
+abstract class View {
   template: string;
   renderTemplate: string;
   container: HTMLElement;
@@ -103,23 +108,45 @@ class View {
   clearHtmlList(): void {
     this.htmlList = [];
   }
+
+  abstract render(): void; // 자식들에게 반드시 구현하라는 의미의 마킹 (추상메소드)
 }
 
 class Router { // 역할: hash가 바뀌었을 때 해당하는 페이지를 보여주는 것
+  routeTable: RouteInfo[];
+  defaultRoute: RouteInfo | null;
+
   constructor() {
-    const routePath = location.hash;
 
     window.addEventListener("hashchange", router); //hash값을 받아 알맞는 라우터를 찾고 보여줄 화면을 지정한다
 
-  if (routePath === "") {
-    newsFeed(); 
-  } else if (routePath.indexOf("#/page/") >= 0) {
-    store.currentPage = Number(routePath.substr(7));
-    newsFeed();
-  } else {
-    newsDetail();
+    this.routeTable = [];
+    this.defaultRoute = null;
   }
+
+  setDefaultPage(page: View): void{
+    this.defaultRoute = {path: '', page}
   }
+
+  addRoutePath(path: string, page: View): void{
+    this.routeTable.push({path, page});
+  }
+
+  route() {
+    const routePath = location.hash;
+
+    if(routePath === '' && this.defaultRoute){
+      this.defaultRoute.page.renderTemplate
+    }
+
+    for(const routeInfo of this.routeTable) {
+      if(routePath.indexOf(routeInfo.path) >= 0) {
+        routeInfo.page.render();
+        break;
+      }
+    }
+  }
+
 }
 
 class NewsFeedView extends View{ // 클래스를 만든다는 것은 인스턴스를 만들어서 인스턴스에 필요한 정보들을 저장해 뒀다가 필요한 경우에 계속 재활용해서 쓸수 있다는 장점
@@ -330,20 +357,10 @@ function newsDetail(): void {
     makeComment(newsContent.comments)));
 }
 
-function router(): void {
-  //location.hash를 통해 지금 보고있는 화면의 위치 해시값을 받아 목록을 보여줄지 내용을 보여줄지 정한다.
-  const routePath = location.hash;
+const router: Router = new Router();
+const newsFeedView = new NewsFeedView('root');
+const newsDetailView = new NewsDetailView('root');
 
-  if (routePath === "") {
-    newsFeed(); //routePath 값에 #만 있는 경우 빈 문자열을 출력한다.
-  } else if (routePath.indexOf("#/page/") >= 0) {
-    store.currentPage = Number(routePath.substr(7));
-    newsFeed();
-  } else {
-    newsDetail();
-  }
-}
-
-window.addEventListener("hashchange", router); //hash값을 받아 알맞는 라우터를 찾고 보여줄 화면을 지정한다
-
-router();
+router.setDefaultPage(newsFeedView);
+router.addroutePath('/page/', newsFeedView);
+router.addroutePath('/show/', newsDetailView);
