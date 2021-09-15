@@ -1,3 +1,5 @@
+import { NewsFeed, NewsDetail} from '../types'
+
 export class Api { // 개념 보완 부분
     ajax: XMLHttpRequest;
     url: string;
