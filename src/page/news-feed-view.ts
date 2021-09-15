@@ -1,10 +1,9 @@
+import View from "../core/view";
+import { NewsFeedApi } from "../core/api";
+import { NewsFeed } from "../types";
+import { NEWS_URL } from "../config";
 
-export default class NewsFeedView extends View{ // 클래스를 만든다는 것은 인스턴스를 만들어서 인스턴스에 필요한 정보들을 저장해 뒀다가 필요한 경우에 계속 재활용해서 쓸수 있다는 장점
-    private api: NewsFeedApi;
-    private feeds: NewsFeed[];
-    
-    constructor(containerId: string) {
-      let template: string = `
+const template: string = `
     <div class="bg-gray-600 min-h-screen">
     <div class="bg-white text-xl">
       <div class="mx-auto px-4">
@@ -28,6 +27,12 @@ export default class NewsFeedView extends View{ // 클래스를 만든다는 것
     </div>
   </div>
       `;
+
+export default class NewsFeedView extends View{ // 클래스를 만든다는 것은 인스턴스를 만들어서 인스턴스에 필요한 정보들을 저장해 뒀다가 필요한 경우에 계속 재활용해서 쓸수 있다는 장점
+    private api: NewsFeedApi;
+    private feeds: NewsFeed[];
+    
+    constructor(containerId: string) {
   
       super(containerId, template);
   

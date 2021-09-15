@@ -1,7 +1,9 @@
+import View from '../core/view';
+import { NewsDetailApi } from '../core/api';
+import { NewsDetail, NewsComment } from '../types';
+import { CONTENT_URL } from '../config';
 
-export default class NewsDetailView extends View {
-    constructor(containerId: string){
-    let template = `
+const template = `
     <div class="bg-gray-600 min-h-screen pb-8">
     <div class="bg-white text-xl">
       <div class="mx-auto px-4">
@@ -29,6 +31,9 @@ export default class NewsDetailView extends View {
     </div>
   </div>
     `;
+export default class NewsDetailView extends View {
+    constructor(containerId: string){
+    
     super(containerId, template);
     }
     render() {
