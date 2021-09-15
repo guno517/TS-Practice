@@ -1,5 +1,5 @@
 
-class NewsFeedView extends View{ // 클래스를 만든다는 것은 인스턴스를 만들어서 인스턴스에 필요한 정보들을 저장해 뒀다가 필요한 경우에 계속 재활용해서 쓸수 있다는 장점
+export default class NewsFeedView extends View{ // 클래스를 만든다는 것은 인스턴스를 만들어서 인스턴스에 필요한 정보들을 저장해 뒀다가 필요한 경우에 계속 재활용해서 쓸수 있다는 장점
     private api: NewsFeedApi;
     private feeds: NewsFeed[];
     

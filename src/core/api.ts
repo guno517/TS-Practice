@@ -1,4 +1,4 @@
-class Api { // 개념 보완 부분
+export class Api { // 개념 보완 부분
     ajax: XMLHttpRequest;
     url: string;
   
@@ -14,13 +14,13 @@ class Api { // 개념 보완 부분
       return JSON.parse(this.ajax.response);
     }
   }
-  class NewsFeedApi extends Api{
+  export class NewsFeedApi extends Api{
     getData(): NewsFeed[] {
       return this.getRequest<NewsFeed[]>();
     }
   }
   
-  class NewsDetailApi extends Api{
+  export class NewsDetailApi extends Api{
     getData(): NewsDetail {
       return this.getRequest<NewsDetail>();
     }

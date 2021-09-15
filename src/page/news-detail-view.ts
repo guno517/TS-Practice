@@ -1,5 +1,5 @@
 
-class NewsDetailView extends View {
+export default class NewsDetailView extends View {
     constructor(containerId: string){
     let template = `
     <div class="bg-gray-600 min-h-screen pb-8">
