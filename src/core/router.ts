@@ -1,3 +1,5 @@
+import {RouteInfo} from '../types'
+import View from './view';
 
 export default class Router { // 역할: hash가 바뀌었을 때 해당하는 페이지를 보여주는 것
     routeTable: RouteInfo[];
