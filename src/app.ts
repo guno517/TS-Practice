@@ -1,3 +1,7 @@
+import Router from "./core/router";
+import { NewsDetailView, NewsFeedView } from "./page";
+import { Store } from "./types";
+
 const store: Store = {
   currentPage: 1,
   feeds: [], //글 읽음 표시 유무를 위한 배열
