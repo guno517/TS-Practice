@@ -1,15 +1,12 @@
 import Router from "./core/router";
 import { NewsDetailView, NewsFeedView } from "./page";
-import { Store } from "./types";
+import Store from './store';
 
-const store: Store = {
-  currentPage: 1,
-  feeds: [], //글 읽음 표시 유무를 위한 배열
-};
+const store = new Store();
 
 const router: Router = new Router();
-const newsFeedView = new NewsFeedView('root');
-const newsDetailView = new NewsDetailView('root');
+const newsFeedView = new NewsFeedView('root', store);
+const newsDetailView = new NewsDetailView('root', store);
 
 router.setDefaultPage(newsFeedView);
 

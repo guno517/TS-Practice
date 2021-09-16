@@ -1,6 +1,13 @@
-export interface Store { // 타입 알리아스 type alias
-    currentPage: number; // 세미콜론
-    feeds: NewsFeed[];
+export interface NewsStore { // 타입 알리아스 type alias
+    getAllFeeds: () => NewsFeed[];
+    getFeed: (position: number) => NewsFeed;
+    setFeeds: (feeds: NewsFeed[]) => void;
+    makeRead: (id: number) => void;
+    hasFeeds: boolean;
+    currentPage: number;
+    numberOfFeed: number;
+    nextPage: number;
+    prevPage: number;
 }
 
 export interface News {

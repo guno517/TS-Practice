@@ -1,6 +1,6 @@
 import View from "../core/view";
 import { NewsFeedApi } from "../core/api";
-import { NewsFeed } from "../types";
+import { NewsStore } from "../types";
 import { NEWS_URL } from "../config";
 
 const template: string = `
@@ -30,26 +30,25 @@ const template: string = `
 
 export default class NewsFeedView extends View{ // 클래스를 만든다는 것은 인스턴스를 만들어서 인스턴스에 필요한 정보들을 저장해 뒀다가 필요한 경우에 계속 재활용해서 쓸수 있다는 장점
     private api: NewsFeedApi;
-    private feeds: NewsFeed[];
+    private store: NewsStore;
     
-    constructor(containerId: string) {
+    constructor(containerId: string, store: NewsStore) {
   
       super(containerId, template);
   
+      this.store = store;
       this.api = new NewsFeedApi(NEWS_URL); // 클래스 인스턴스
-      this.feeds = store.feeds;
   
-      if (this.feeds.length === 0) {
-        this.feeds = store.feeds = this.api.getData();
-        this.makeFeeds();
+      if (!this.store.hasFeeds) {
+        this.store.setFeeds(this.api.getData());
       }
     }
   
-    render():void {
-      store.currentPage = Number(location.hash.substr(7) || 1);
+    render = (page: string = '1'):void => {
+      this.store.currentPage = Number(page);
   
-      for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
-        const {id, title, comments_count, user, points, time_ago, read} = this.feeds[i];
+      for (let i = (this.store.currentPage - 1) * 10; i < this.store.currentPage * 10; i++) {
+        const {id, title, comments_count, user, points, time_ago, read} = this.store.getFeed(i);
         this.addHtml(`
         <div class="p-6 ${
           read ? "bg-red-500" : "bg-white"
@@ -78,17 +77,10 @@ export default class NewsFeedView extends View{ // 클래스를 만든다는 것
       this.setTemplateDate("news_feed", this.getHtml());
       this.setTemplateDate(
         "prev_page",
-        String(store.currentPage > 1 ? store.currentPage - 1 : 1)
+        String(this.store.currentPage > 1 ? this.store.currentPage - 1 : 1)
       );
-      this.setTemplateDate("next_page", String(store.currentPage + 1));
+      this.setTemplateDate("next_page", String(this.store.currentPage + 1));
     
       this.updateView();
       }
-  
-      private makeFeeds(): void {
-        for (let i = 0; i < this.feeds.length; i++) {
-          this.feeds[i].read = false;
-        }
-      }
   }
-  

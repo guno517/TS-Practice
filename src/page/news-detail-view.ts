@@ -1,6 +1,6 @@
 import View from '../core/view';
 import { NewsDetailApi } from '../core/api';
-import { NewsDetail, NewsComment } from '../types';
+import { NewsComment, NewsStore } from '../types';
 import { CONTENT_URL } from '../config';
 
 const template = `
@@ -32,30 +32,27 @@ const template = `
   </div>
     `;
 export default class NewsDetailView extends View {
-    constructor(containerId: string){
+    private store: NewsStore;
     
-    super(containerId, template);
+    constructor(containerId: string, store: NewsStore){
+      super(containerId, template);
+      this.store = store;
     }
-    render() {
-      const id = location.hash.substr(7); //주소와 관련된 정보 제공, substr: () 안의 값 이후부터 끝가지 문자열 출력
+
+    render = (id: string): void => {
       const api = new NewsDetailApi(CONTENT_URL.replace('@id', id));
-      const newsDetail: NewsDetail = api.getData();
-      
-    for (let i = 0; i < store.feeds.length; i++) {
-      if (store.feeds[i].id === Number(id)) {
-        store.feeds[i].read = true;
-        break;
-      }
-    }
+      const {title, content, comments} = api.getData();
     
-    this.setTemplateDate("comments", this.makeComment(newsDetail.comments));
-    this.setTemplateDate('currentPage', String(store.currentPage));
-    this.setTemplateDate('title', newsDetail.title);
-    this.setTemplateDate('content', newsDetail.content);
+      this.store.makeRead(Number(id));
+      this.setTemplateDate('currentPage', String(this.store.currentPage.toString()));
+      this.setTemplateDate('title', title);
+      this.setTemplateDate('content', content);
+      this.setTemplateDate("comments", this.makeComment(comments));
   
-    this.updateView();
+      this.updateView();
     }
-    makeComment(comments: NewsComment[]): string {
+
+    private makeComment(comments: NewsComment[]): string {
       for (let i = 0; i < comments.length; i++) {
           const comment: NewsComment = comments[i];
         this.addHtml(`
