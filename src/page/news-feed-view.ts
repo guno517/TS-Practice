@@ -45,7 +45,7 @@ export default class NewsFeedView extends View{ // 클래스를 만든다는 것
       this.store.currentPage = Number(page);
       
       if (!this.store.hasFeeds) {
-        this.api.getData((feeds: NewsFeed[]) => {
+        this.api.getDataWithPromise((feeds: NewsFeed[]) => {
           this.store.setFeeds(feeds);
           this.renderView();
         })

@@ -41,8 +41,8 @@ export default class NewsDetailView extends View {
 
     render = (id: string): void => {
       const api = new NewsDetailApi(CONTENT_URL.replace('@id', id));
-      api.getData((data: NewsDetail) => {
 
+      api.getDataWithPromise((data: NewsDetail) => {
         const {title, content, comments} = data;
       
         this.store.makeRead(Number(id));
@@ -52,12 +52,13 @@ export default class NewsDetailView extends View {
         this.setTemplateDate("comments", this.makeComment(comments));
     
         this.updateView();
-      })
+      });
     }
 
     private makeComment(comments: NewsComment[]): string {
       for (let i = 0; i < comments.length; i++) {
           const comment: NewsComment = comments[i];
+
         this.addHtml(`
             <div style="padding-left: ${comment.level * 40}px;" class="mt-4">
             <div class="text-gray-400">
@@ -69,12 +70,12 @@ export default class NewsDetailView extends View {
             `);
   
         if (comment.comments.length > 0) {
-          this.addHtml(this.makeComment(comment.comments)); // 재귀함수를 사용해서 대댓글 기능 구현(끝을 알 수 없는 구조에서 유용)
+          this.addHtml(this.makeComment(comment.comments)); 
+          // 재귀함수를 사용해서 대댓글 기능 구현(끝을 알 수 없는 구조에서 유용)
           // 댓글이 몇번 호출 되었는지 체크하여 대댓글의 UI를 바꾼다(윗 댓글보다 padding이 더 들어가도록)
         }
       }
   
       return this.getHtml();
     }
-  }
-  
+}  
