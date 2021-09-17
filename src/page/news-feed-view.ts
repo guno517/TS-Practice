@@ -75,11 +75,8 @@ export default class NewsFeedView extends View{ // 클래스를 만든다는 것
       }
     
       this.setTemplateDate("news_feed", this.getHtml());
-      this.setTemplateDate(
-        "prev_page",
-        String(this.store.currentPage > 1 ? this.store.currentPage - 1 : 1)
-      );
-      this.setTemplateDate("next_page", String(this.store.currentPage + 1));
+      this.setTemplateDate("prev_page", String(this.store.prevPage));
+      this.setTemplateDate("next_page", String(this.store.nextPage));
     
       this.updateView();
       }
