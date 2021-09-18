@@ -1,3 +1,5 @@
+import View from "../core/view";
+
 export interface NewsStore { // 타입 알리아스 type alias
     getAllFeeds: () => NewsFeed[];
     getFeed: (position: number) => NewsFeed;

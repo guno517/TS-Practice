@@ -1,7 +1,7 @@
 import { NewsFeed, NewsStore } from "./types";
 
 
-export default class Store implements NewsStore{
+export class Store implements NewsStore{
     private feeds: NewsFeed[];
     private _currentPage: number;
 
@@ -49,7 +49,7 @@ export default class Store implements NewsStore{
         }));
     }
 
-    makeRead(id: number): void {
+    makeRead(id: number) {
         const feed = this.feeds.find((feed: NewsFeed) => feed.id === id);
     }
 

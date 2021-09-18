@@ -1,6 +1,6 @@
 import Router from "./core/router";
 import { NewsDetailView, NewsFeedView } from "./page";
-import Store from './store';
+import { Store } from "./store";
 
 const store = new Store();
 
