@@ -6,7 +6,7 @@ export default abstract class View {
     private htmlList: string[];
   
     constructor(containerId: string, template: string) {
-      const containerElement = document.getElementById(containerId);
+      const containerElement: HTMLElement | null = document.getElementById(containerId);
   
       if(!containerElement) {
         throw '최상위 컨테이너가 없어 UI를 진행하지 못합니다';
@@ -33,7 +33,7 @@ export default abstract class View {
       return snapshot;
     }
   
-    protected setTemplateDate(key: string, value: string): void{
+    protected setTemplateDate(key: string, value: string){
       this.renderTemplate = this.renderTemplate.replace(`{{__${key}__}}`, value);
     }
   
@@ -41,6 +41,6 @@ export default abstract class View {
       this.htmlList = [];
     }
   
-    abstract render(): void; // 자식들에게 반드시 구현하라는 의미의 마킹 (추상메소드)
+    abstract render(...params: string[]): void; // 자식들에게 반드시 구현하라는 의미의 마킹 (추상메소드)
   }
   
