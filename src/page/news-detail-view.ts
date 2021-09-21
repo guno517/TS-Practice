@@ -40,7 +40,7 @@ export default class NewsDetailView extends View {
     }
 
     render = async (id: string): Promise<void> => {
-      const api = new NewsDetailApi(CONTENT_URL.replace('@id', id));
+      const api = new NewsDetailApi(id);
 
       const {title, content, comments} = await api.getData();
     
