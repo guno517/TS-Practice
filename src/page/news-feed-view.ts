@@ -33,11 +33,10 @@ export default class NewsFeedView extends View{ // 클래스를 만든다는 것
     private store: NewsStore;
     
     constructor(containerId: string, store: NewsStore) {
-  
       super(containerId, template);
   
       this.store = store;
-      this.api = new NewsFeedApi(NEWS_URL); // 클래스 인스턴스
+      this.api = new NewsFeedApi(); // 클래스 인스턴스
   
     }
     
