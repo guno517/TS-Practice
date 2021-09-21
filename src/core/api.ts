@@ -1,3 +1,4 @@
+import { CONTENT_URL, NEWS_URL } from '../config';
 import { NewsFeed, NewsDetail} from '../types'
 
 export class Api { // 개념 보완 부분
@@ -16,8 +17,8 @@ export class Api { // 개념 보완 부분
   }
   
   export class NewsFeedApi extends Api{
-    constructor(url: string){
-      super(url);
+    constructor(){
+      super(NEWS_URL);
     }
 
     async getData(): Promise<NewsFeed[]> {
@@ -26,8 +27,8 @@ export class Api { // 개념 보완 부분
   }
   
   export class NewsDetailApi extends Api{
-    constructor(url: string){
-      super(url);
+    constructor(id: string){
+      super(CONTENT_URL.replace('@id',id));
     }
 
     async getData(): Promise<NewsDetail> {
