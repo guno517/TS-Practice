@@ -42,7 +42,7 @@ export class Store implements NewsStore{
         return this.feeds[position];
     }
 
-    setFeeds(feeds: NewsFeed[]): void {
+    setFeeds = (feeds: NewsFeed[]) => {
         this.feeds = feeds.map(feed => ({
             ...feed,
             read: false
@@ -51,9 +51,9 @@ export class Store implements NewsStore{
 
     makeRead(id: number) {
         const feed = this.feeds.find((feed: NewsFeed) => feed.id === id);
-    }
 
-    if(feed) {
-        feed.read = true
+        if(feed) {
+            feed.read = true
+        }
     }
 }

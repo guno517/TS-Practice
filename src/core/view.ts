@@ -1,8 +1,8 @@
 
 export default abstract class View {
+  private container: HTMLElement;
     private template: string;
     private renderTemplate: string;
-    private container: HTMLElement;
     private htmlList: string[];
   
     constructor(containerId: string, template: string) {
