@@ -34,14 +34,14 @@ export class Store implements NewsStore{
         return this.feeds.length > 0;
     }
 
-    getAllFeeds(): NewsFeed[] {
-        return this.feeds;
-    }
-
     getFeed(position: number): NewsFeed {
         return this.feeds[position];
     }
-
+    
+    getAllFeeds(): NewsFeed[] {
+        return this.feeds;
+    }
+    
     setFeeds = (feeds: NewsFeed[]) => {
         this.feeds = feeds.map(feed => ({
             ...feed,
