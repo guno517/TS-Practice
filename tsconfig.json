@@ -1,11 +1,12 @@
 {
     "compilerOptions": {
-        "strict": true,
-        "module": "CommonJS",
-        "sourceMap": true,
-        "lib": [
-            "ES6",
-            "DOM"
-        ]
-    }
-}
+      "strict": true,
+      "module": "CommonJS",
+      "sourceMap": true,
+      "lib": [
+        "es6",
+        "dom"
+      ]
+    } 
+  }
+  
